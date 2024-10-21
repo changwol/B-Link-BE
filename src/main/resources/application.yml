@@ -1,3 +1,5 @@
+jwt:
+  secret: YmxpbmtwYXNzd29yZA==
 
 spring:
   data:
