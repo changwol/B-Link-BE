@@ -54,21 +54,6 @@ public class ChatController {
                 .then();
     }//클라송신
 
-    @GetMapping("/roomList")
-    public ResponseEntity<List<ChatRoomDto>> getChatRoomList() {
-        List<ChatRoomDto> responses = chatRoomService.findChatRoomList();
-        return ResponseEntity.ok(responses);
-    }
-
-    @GetMapping("/findRoom")
-    public Mono<ResponseEntity<List<Message>>> findRoom(@RequestParam("roomId") String roomId) {
-        return messageRepository.findByRoomId(roomId)
-                .collectList()
-                .map(messages -> messages.isEmpty()
-                        ? ResponseEntity.notFound().build()
-                        : ResponseEntity.ok(messages));
-    }
-
     @GetMapping("/rooms/{roomId}/findMessage")
     public Mono<ResponseEntity<?>> getMessagesByRoomId(@PathVariable String roomId) {
         return messageRepository.findByRoomId(roomId)
