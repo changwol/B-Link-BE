@@ -1,6 +1,6 @@
-package com.blink.server.Dto;
+package com.blink.server.chat.dto;
 
-import com.blink.server.Entity.Message;
+import com.blink.server.chat.entity.Message;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

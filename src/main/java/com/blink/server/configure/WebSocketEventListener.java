@@ -1,4 +1,4 @@
-package com.blink.server.Configure;
+package com.blink.server.configure;
 
 
 import org.slf4j.Logger;

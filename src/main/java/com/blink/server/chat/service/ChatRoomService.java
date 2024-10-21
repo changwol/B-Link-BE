@@ -1,8 +1,8 @@
-package com.blink.server.Service;
+package com.blink.server.chat.service;
 
-import com.blink.server.Dto.ChatRoomDto;
-import com.blink.server.Entity.ChatRoom;
-import com.blink.server.Repository.RoomRepository;
+import com.blink.server.chat.dto.ChatRoomDto;
+import com.blink.server.chat.entity.ChatRoom;
+import com.blink.server.chat.repository.RoomRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

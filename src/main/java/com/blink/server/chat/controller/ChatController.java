@@ -1,12 +1,10 @@
-package com.blink.server.Controller;
+package com.blink.server.chat.controller;
 
-import com.blink.server.Dto.ChatRoomDto;
-import com.blink.server.Dto.MessageDto;
-import com.blink.server.Entity.Message;
-import com.blink.server.Repository.MessageRepository;
-import com.blink.server.Repository.RoomRepository;
-import com.blink.server.Service.ChatRoomService;
-import com.blink.server.Service.MessageService;
+import com.blink.server.chat.dto.MessageDto;
+import com.blink.server.chat.repository.MessageRepository;
+import com.blink.server.chat.repository.RoomRepository;
+import com.blink.server.chat.service.ChatRoomService;
+import com.blink.server.chat.service.MessageService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +14,6 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor

@@ -1,6 +1,6 @@
-package com.blink.server.Repository;
+package com.blink.server.chat.repository;
 
-import com.blink.server.Entity.Message;
+import com.blink.server.chat.entity.Message;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 

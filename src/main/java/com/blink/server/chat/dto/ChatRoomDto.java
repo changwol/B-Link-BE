@@ -1,4 +1,4 @@
-package com.blink.server.Dto;
+package com.blink.server.chat.dto;
 
 import lombok.Builder;
 import lombok.Getter;

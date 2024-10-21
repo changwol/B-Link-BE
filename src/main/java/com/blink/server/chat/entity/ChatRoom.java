@@ -1,4 +1,4 @@
-package com.blink.server.Entity;
+package com.blink.server.chat.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

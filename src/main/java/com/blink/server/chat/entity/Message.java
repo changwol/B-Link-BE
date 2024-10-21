@@ -1,8 +1,7 @@
-package com.blink.server.Entity;
+package com.blink.server.chat.entity;
 
 import jakarta.persistence.Id;
 import lombok.*;
-import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
