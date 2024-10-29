@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 public class BoardController {
-//    @Autowired
-//    private final BoardService boardService;
+    private final BoardService boardService;
 
 }

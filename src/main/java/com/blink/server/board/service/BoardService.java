@@ -4,10 +4,10 @@ import com.blink.server.board.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-//@Service
-//@RequiredArgsConstructor
+@Service
+@RequiredArgsConstructor
 public class BoardService {
-//    private final BoardRepository boardRepository;
+    private final BoardRepository boardRepository;
 
 
 
