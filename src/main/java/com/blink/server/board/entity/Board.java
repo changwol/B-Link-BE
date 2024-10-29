@@ -1,6 +1,6 @@
 package com.blink.server.board.entity;
 
-import com.blink.server.user.entity.User;
+import com.blink.server.member.entity.Member;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -25,6 +25,6 @@ public class Board {
     private int boardView; // 조회수
 
     @DBRef(lazy = true) // 지연방식 연관관계 설정 ( 작성자의 정보 )
-    private User user;
+    private Member member;
 
 }
