@@ -18,7 +18,7 @@ public class ChatRoomDto {
         this.id = id;
         this.roomName = roomName;
     }
-    public static ChatRoomDto of(UUID id, String roomName) {
-        return new ChatRoomDto(id.toString(), roomName);
+    public static ChatRoomDto of(String id, String roomName) {
+        return new ChatRoomDto(id, roomName);
     }
 }

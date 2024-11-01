@@ -1,11 +1,15 @@
 package com.blink.server.chat.controller;
 
+import com.blink.server.chat.dto.ChatRoomDto;
 import com.blink.server.chat.dto.MessageDto;
+import com.blink.server.chat.entity.ChatRoom;
 import com.blink.server.chat.repository.MessageRepository;
-import com.blink.server.chat.repository.RoomRepository;
+//import com.blink.server.chat.repository.RoomRepository;
 import com.blink.server.chat.service.ChatRoomService;
 import com.blink.server.chat.service.MessageService;
 
+import com.blink.server.user.repository.UserRepository;
+import com.blink.server.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -15,6 +19,8 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.Optional;
+
 @RestController
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:3000")
@@ -23,8 +29,11 @@ public class ChatController {
     private final SimpMessageSendingOperations template;
     private final MessageService messageService;
     private final ChatRoomService chatRoomService;
-    private final RoomRepository roomRepository;
+//    private final RoomRepository roomRepository;
     private final MessageRepository messageRepository;
+    private final UserRepository userRepository;
+    private final UserService userService;
+    
 
     @MessageMapping("/message/rooms/{roomId}")
     @SendTo("/sub/rooms/{roomId}")
@@ -60,4 +69,13 @@ public class ChatController {
                         : ResponseEntity.ok(messages))//200
                 .defaultIfEmpty(ResponseEntity.notFound().build()); // 예외 처리
     }//지금까지 저장된 데이터
+    //채팅
+//    @PostMapping("/chat/create")
+//    public ChatRoomDto createChatRoom(@RequestBody ChatRoomDto chatRoomDto) {
+//        return chatRoomService.createChatRoom(chatRoomDto);
+//    }
+//    @GetMapping("/chat/find/{userId}")
+//    public Optional<ChatRoom> getAllChatRooms(@PathVariable String userId) {
+//        return chatRoomService.getChatRoom(userId); // 특정 roomId로 채팅 방 반환
+//    }
 }

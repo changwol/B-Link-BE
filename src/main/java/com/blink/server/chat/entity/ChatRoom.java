@@ -3,8 +3,6 @@ package com.blink.server.chat.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.UUID;
-
 @Entity
 @Getter
 @Table(name = "chat_room")
@@ -12,13 +10,13 @@ import java.util.UUID;
 public class ChatRoom {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    private String id;
 
     @Column(name = "room_name")
     private String roomName; // 대문자로 시작하는 변수명
 
-    public ChatRoom(String roomName) {
+    public ChatRoom(String id, String roomName) {
+        this.id = id;
         this.roomName = roomName;
     }
 }

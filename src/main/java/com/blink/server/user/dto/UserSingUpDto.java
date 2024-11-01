@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -20,6 +22,7 @@ public class UserSingUpDto {
     private String userRegDate; // yyyymmdd 형식으로 전달
     private String userBirthDate; // yyyymmdd 형식으로 전달
     private boolean userSex; // true for men, false for woman
+    private List<String> roomIds; // 여러 개의 roomId를 저장할 수 있는 필드 추가
 
     public static UserSingUpDto of(User user) {
         return new UserSingUpDto(
@@ -31,7 +34,8 @@ public class UserSingUpDto {
                 user.getUserStudentNumber(),
                 user.getUserRegDate(),
                 user.getUserBirthDate(),
-                user.isUserSex()
+                user.isUserSex(),
+                user.getRoomIds() // User 엔티티에서 roomIds 가져오기
         );
     }
 }
