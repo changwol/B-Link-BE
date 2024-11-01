@@ -42,6 +42,7 @@ public class JwTokenProvider {
         Date accessTokenExpiration = new Date(now + 1000 * 60 * 60 ); // 1 시간뒤 만료 설정
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
+                .claim("userId", authentication.getName())
                 .claim("auth", authorities)
                 .setExpiration(accessTokenExpiration)
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -55,8 +56,6 @@ public class JwTokenProvider {
 
     /**
      * 토큰에 들어있는 정보를 복호화해서 꺼내는 메서드
-     * @param token
-     * @return
      */
     public Authentication getAuthentication(String token) {
         Claims claims = parseClaims(token);
@@ -75,8 +74,7 @@ public class JwTokenProvider {
 
     /**
      * 토큰 유효성을 검사하는 메서드
-     * @param token
-     * @return
+     * @param token 을 String 으로 전달
      */
     public boolean validateToken(String token) {
         try {

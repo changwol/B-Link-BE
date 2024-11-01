@@ -7,21 +7,22 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
 public class CustomMemberDetailsService implements UserDetailsService {
     private final MemberRepository memberRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return memberRepository.findByMemberId(username)
-                .map(this::createUserDetails)
-                .blockOptional().orElseThrow(() -> new UsernameNotFoundException("해당하는 회원을 찾을 수 없습니다."));
+                .map(this::createUserDetails) // UserDetails로 변환
+                .switchIfEmpty(Mono.error(new UsernameNotFoundException("해당하는 회원을 찾을 수 없습니다."))) // 예외 처리
+                .block(); // 결과를 동기적으로 가져옵니다.
     }
+
 
     public UserDetails createUserDetails(Member member) {
         return User.builder()

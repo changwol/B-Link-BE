@@ -42,12 +42,12 @@ public class Member implements UserDetails {
 
     @Override
     public String getPassword() {
-        return "";
+        return this.memberPassWord;
     }
 
     @Override
     public String getUsername() {
-        return "";
+        return this.memberId;
     }
 
 }
