@@ -19,14 +19,13 @@ import java.time.LocalDateTime;
 @Builder
 public class Board{
     @Id
-    private BigInteger boardCode;
+    private String boardCode;
     private String boardTitle;
     private String boardContent;
     private String boardPostDate; // yyyymmdd 형식으로 기입
     private boolean boardIsAnnouncement;
     private int boardView; // 조회수
 
-    @DBRef(lazy = true) // 지연방식 연관관계 설정 ( 작성자의 정보 )
     private Member member;
 
     static public Board postDtoToEntity(BoardPostDto dto,Member member) {

@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @Builder
 public class Member implements UserDetails {
     @Id
-    private BigInteger memberCode;
+    private String memberCode;
     private String memberId;
     private String memberPassWord;
     private String memberName;

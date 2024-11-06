@@ -1,15 +1,13 @@
 package com.blink.server.chat.controller;
 
-import com.blink.server.chat.dto.ChatRoomDto;
 import com.blink.server.chat.dto.MessageDto;
-import com.blink.server.chat.entity.ChatRoom;
 import com.blink.server.chat.repository.MessageRepository;
 //import com.blink.server.chat.repository.RoomRepository;
 import com.blink.server.chat.service.ChatRoomService;
 import com.blink.server.chat.service.MessageService;
 
-import com.blink.server.user.repository.UserRepository;
-import com.blink.server.user.service.UserService;
+import com.blink.server.member.repository.MemberRepository;
+import com.blink.server.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -18,8 +16,6 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
-
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,9 +27,6 @@ public class ChatController {
     private final ChatRoomService chatRoomService;
 //    private final RoomRepository roomRepository;
     private final MessageRepository messageRepository;
-    private final UserRepository userRepository;
-    private final UserService userService;
-    
 
     @MessageMapping("/message/rooms/{roomId}")
     @SendTo("/sub/rooms/{roomId}")

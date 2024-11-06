@@ -80,4 +80,11 @@ public class MemberService {
         System.out.println(jwToken);
         return jwToken;
     }
+
+    public Mono<Boolean> isThisPasswordMatch(String memberId ,String memberPassword) {
+        Mono<Member> findMember = memberRepository.findByMemberId(memberId);
+        return findMember.map(member -> bCryptPasswordEncoder.matches(memberPassword, member.getMemberPassWord()))
+                .switchIfEmpty(Mono.just(false));
+
+    }
 }
