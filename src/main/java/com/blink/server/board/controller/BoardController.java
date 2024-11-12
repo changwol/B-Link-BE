@@ -1,8 +1,6 @@
 package com.blink.server.board.controller;
 
-import com.blink.server.board.dto.BoardDeleteDto;
-import com.blink.server.board.dto.BoardDetailResponseDto;
-import com.blink.server.board.dto.BoardPostDto;
+import com.blink.server.board.dto.*;
 import com.blink.server.board.service.BoardService;
 import com.blink.server.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,7 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -60,11 +62,17 @@ public class BoardController {
     }
 
     @GetMapping("/content/{id}")
-    @Operation(summary = "글 조회하기" , description = "게시글을 조회하는 메서드입니다. JWT 가 필요하지 않습니다.")
+    @Operation(summary = "글 조회하기", description = "게시글을 조회하는 메서드입니다. JWT 가 필요하지 않습니다.")
     public Mono<ResponseEntity<BoardDetailResponseDto>> getBoard(@PathVariable("id") String id) {
         return boardService.getBoardResponseDto(id)
                 .map(boardDetailResponseDto -> ResponseEntity.ok(boardDetailResponseDto)) // 200 OK와 함께 DTO 반환
                 .switchIfEmpty(Mono.just(ResponseEntity.notFound().build())); // 내용이 없으면 404 반환
 
+    }
+
+    @GetMapping("/content/list")
+    @Operation(summary = "게시글 목록보기", description = "게시글 목록을 불러오는 메서드입니다. 파라미터로 몇번째 page 를 조회할건지 보내야합니다.")
+    public Mono<ResponseEntity<BoardListResponseDto>> getBoardContentList(@RequestParam int page) {
+        return Mono.just(ResponseEntity.ok(boardService.getBoardList(page)));
     }
 }

@@ -1,6 +1,8 @@
 package com.blink.server.board.service;
 
+import com.blink.server.board.dto.BoardListInformationDto;
 import com.blink.server.board.dto.BoardDetailResponseDto;
+import com.blink.server.board.dto.BoardListResponseDto;
 import com.blink.server.board.dto.BoardPostDto;
 import com.blink.server.board.entity.Board;
 import com.blink.server.board.repository.BoardRepository;
@@ -9,7 +11,10 @@ import com.blink.server.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -33,11 +38,15 @@ public class BoardService {
     }
 
     public void deleteBoard(String boardCode) {
-        System.out.println("boardCode = " + boardCode);
         ObjectId objectId = new ObjectId(boardCode);
         boardRepository.deleteByBoardCode(objectId).subscribe();
     }
 
+    /**
+     * 게시글 ID 값을 이용해 하나의 게시글 리턴하는 메서드
+     * @param boardCode Board ID 값
+     * @return BoardEntity -> DTO 로 변환후 리턴
+     */
     public Mono<BoardDetailResponseDto> getBoardResponseDto(String boardCode) {
         ObjectId objectId = new ObjectId(boardCode);
         return boardRepository.findBoardByBoardCode(objectId)
@@ -62,4 +71,33 @@ public class BoardService {
                 })
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("작성글이 존재하지 않습니다.")));
     }
+
+
+    /**
+     * 게시글 목록 가져오는 메서드
+     * @param page 게시글 페이지. 20 * page
+     * @return BoardListResponseDto
+     */
+    public BoardListResponseDto getBoardList(int page) {
+        int pageSize = 20; // 페이지당 항목 수
+
+        // 게시물 목록을 가져오고, 해당 목록의 총 개수를 함께 가져옵니다.
+        long count = boardRepository.count().switchIfEmpty(Mono.just(0L)).block();  // .block()을 사용하여 count 값을 동기적으로 가져옵니다.
+
+        // 게시물 목록을 가져와서 DTO로 매핑
+        Flux<BoardListInformationDto> boardListFlux = boardRepository.findAll()
+                .skip((page-1) * pageSize) // page 번호에 맞춰 건너뛴 후
+                .take(pageSize)        // pageSize 만큼 가져옵니다
+                .map(board -> new BoardListInformationDto(
+                        board.getBoardTitle(),
+                        board.getBoardPostDate(),
+                        board.getMember().getMemberId(),  // board에서 memberId를 가져옴
+                        board.getBoardView()
+                ));
+        List<BoardListInformationDto> list = boardListFlux.collectList().block();
+
+        // boardListFlux가 Flux<BoardListInformationDto>이므로 이를 Mono로 묶고, count와 함께 반환
+        return new BoardListResponseDto(count, list);
+    }
+
 }
