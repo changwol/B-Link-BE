@@ -2,6 +2,7 @@ package com.blink.server.member.service;
 
 import com.blink.server.jwt.JwToken;
 import com.blink.server.jwt.JwTokenProvider;
+import com.blink.server.member.dto.MemberInfoDto;
 import com.blink.server.member.dto.MemberSingUpDto;
 import com.blink.server.member.entity.Member;
 import com.blink.server.member.repository.MemberRepository;
@@ -86,5 +87,22 @@ public class MemberService {
         return findMember.map(member -> bCryptPasswordEncoder.matches(memberPassword, member.getMemberPassWord()))
                 .switchIfEmpty(Mono.just(false));
 
+    }
+
+    public Mono<MemberInfoDto> getMemberInfomation(String memberId) {
+        Mono<Member> findMember = memberRepository.findByMemberId(memberId);
+        return findMember.map(member ->
+            MemberInfoDto.builder()
+                    .memberCode(member.getMemberCode())
+                    .memberId(member.getMemberId())
+                    .memberName(member.getMemberName())
+                    .memberEmail(member.getMemberEmail())
+                    .memberTel(member.getMemberTel())
+                    .memberStudentNumber(member.getMemberStudentNumber())
+                    .memberRegDate(member.getMemberRegDate())
+                    .memberBirthDate(member.getMemberBirthDate())
+                    .memberSex(member.isMemberSex())
+                    .build())
+        .switchIfEmpty(Mono.just(null));
     }
 }
