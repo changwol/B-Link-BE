@@ -88,7 +88,9 @@ public class BoardService {
         Flux<BoardListInformationDto> boardListFlux = boardRepository.findAll()
                 .skip((page-1) * pageSize) // page 번호에 맞춰 건너뛴 후
                 .take(pageSize)        // pageSize 만큼 가져옵니다
+                .sort((a,b) -> b.getBoardPostDate().compareTo(a.getBoardPostDate())) // 날짜 최신순 정렬
                 .map(board -> new BoardListInformationDto(
+                        board.getBoardCode(),
                         board.getBoardTitle(),
                         board.getBoardPostDate(),
                         board.getMember().getMemberId(),  // board에서 memberId를 가져옴

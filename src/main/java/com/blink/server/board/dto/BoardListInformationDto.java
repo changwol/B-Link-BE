@@ -8,6 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class BoardListInformationDto {
+    private String boardCode;
     private String boardTitle;
     private String boardPostDate;
     private String boardAuthor;
