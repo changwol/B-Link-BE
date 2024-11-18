@@ -78,7 +78,6 @@ public class MemberService {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
         JwToken jwToken = jwTokenProvider.generateToken(authentication);
-        System.out.println(jwToken);
         return jwToken;
     }
 
@@ -103,6 +102,6 @@ public class MemberService {
                     .memberBirthDate(member.getMemberBirthDate())
                     .memberSex(member.isMemberSex())
                     .build())
-        .switchIfEmpty(Mono.just(null));
+        .switchIfEmpty(Mono.empty());
     }
 }

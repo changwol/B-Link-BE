@@ -79,11 +79,12 @@ public class MemberController {
      * MyPage 에 필요한 정보들을 return 해주는 메서드.
      * @return MemberInfoDto
      */
-    @GetMapping("/member")
+    @GetMapping("/mypage")
     @Operation(summary = "마이페이지",description = "마이페이지에 필요한 정보들을 제공해주는 메서드입니다. JWT 가 필요합니다.")
     public Mono<ResponseEntity<MemberInfoDto>> getMemberInfomation() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
+        System.out.println("userId = " + userId);
         return memberService.getMemberInfomation(userId)
                 .map(memberInfo -> ResponseEntity.ok(memberInfo))
                 .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
