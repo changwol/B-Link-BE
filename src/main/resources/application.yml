@@ -1,20 +1,13 @@
 jwt:
-  secret: YmxpbmtwYXNzd29yZA==
+  secret: tOpStXDMXpCj19sCAMy73pBNiKHqUiK67ZjlgvIlwvtaz5BAcMJbyjU
 
 spring:
   data:
     mongodb:
-      host: localhost
+      host: 127.0.0.1
+#      host: 125.191.254.22
       port: 27017
       database: chat
-    mysql:
-      url: jdbc:mysql://localhost:3306/room
-      username: root
-      password: 1234
-  jpa:
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
+      authentication-database: test
 server:
   port: 8080

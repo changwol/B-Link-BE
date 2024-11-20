@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @Builder
 public class Member implements UserDetails {
     @Id
-    private BigInteger memberCode;
+    private String memberCode;
     private String memberId;
     private String memberPassWord;
     private String memberName;
@@ -32,6 +32,8 @@ public class Member implements UserDetails {
     private String memberRegDate;
     private String memberBirthDate;
     private boolean memberSex; // 1 man , 0 woman
+    @Getter
+    private List<String> roomIds;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

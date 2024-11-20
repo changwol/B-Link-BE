@@ -1,22 +1,19 @@
 package com.blink.server.chat.entity;
 
-import jakarta.persistence.*;
+
+import org.springframework.data.annotation.Id;
 import lombok.*;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
+
+@Document(collection = "room")
 @Getter
-@Table(name = "chat_room")
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
+@Setter
 public class ChatRoom {
-
     @Id
     private String id;
-
-    @Column(name = "room_name")
-    private String roomName; // 대문자로 시작하는 변수명
-
-    public ChatRoom(String id, String roomName) {
-        this.id = id;
-        this.roomName = roomName;
-    }
+    private String roomName;
 }
