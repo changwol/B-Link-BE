@@ -1,12 +1,14 @@
 package com.blink.server.member.service;
 
+import com.blink.server.chat.event.RoomIdChangEvent;
 import com.blink.server.jwt.JwToken;
 import com.blink.server.jwt.JwTokenProvider;
 import com.blink.server.member.dto.MemberInfoDto;
 import com.blink.server.member.dto.MemberSingUpDto;
 import com.blink.server.member.entity.Member;
 import com.blink.server.member.repository.MemberRepository;
-import jakarta.transaction.Transactional;
+
+//import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,9 +17,15 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.DirectProcessor;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxProcessor;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -30,6 +38,10 @@ public class MemberService {
     private final JwTokenProvider jwTokenProvider;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    private final FluxProcessor<RoomIdChangEvent,RoomIdChangEvent> roomIdChangeEventPublisher =
+            DirectProcessor.create();
+
+
     public boolean canUseThisUserId(String userId) {
         return true; // DB 조회해서 구현 필요
     }
@@ -39,18 +51,22 @@ public class MemberService {
      * @param dto 회원가입 위한 DTO
      * @return
      */
-    @Transactional
+    LocalDate today = LocalDate.now();
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+    String formattedDate = today.format(formatter);
     public Mono<Member> saveUser(MemberSingUpDto dto) {
         Member member = new Member();
-        member.setMemberId(dto.getUserId());
-        member.setMemberPassWord(bCryptPasswordEncoder.encode(dto.getUserPassWord()));
-        member.setMemberName(dto.getUserName());
-        member.setMemberEmail(dto.getUserEmail());
-        member.setMemberTel(dto.getUserTel());
-        member.setMemberStudentNumber(String.valueOf(dto.getUserStudentNumber()));
-        member.setMemberRegDate(dto.getUserRegDate());
-        member.setMemberBirthDate(dto.getUserBirthDate());
-        member.setMemberSex(dto.isUserSex());
+        member.setMemberId(dto.getMemberId());
+        member.setMemberPassWord(bCryptPasswordEncoder.encode(dto.getMemberPassWord()));
+        member.setMemberName(dto.getMemberName());
+        member.setMemberEmail(dto.getMemberEmail());
+        member.setMemberTel(dto.getMemberTel());
+        member.setMemberStudentNumber(String.valueOf(dto.getMemberStudentNumber()));
+        member.setMemberRegDate(formattedDate);
+        member.setMemberBirthDate(dto.getMemberBirthDate());
+        member.setRoomIds(Collections.singletonList(dto.getRoomIds().toString()));
+        member.setMemberSex(dto.isMemberSex());
         List<String> roles = new ArrayList<>();
         roles.add("member_student");
         member.setMemberRoles(roles);
@@ -61,7 +77,8 @@ public class MemberService {
                 member.getMemberTel(),
                 member.getMemberStudentNumber(),
                 member.getMemberRegDate(),
-                member.getMemberBirthDate());
+                member.getMemberBirthDate()
+        );
 
         return memberRepository.save(member);
     }
@@ -87,21 +104,42 @@ public class MemberService {
                 .switchIfEmpty(Mono.just(false));
 
     }
-
     public Mono<MemberInfoDto> getMemberInfomation(String memberId) {
         Mono<Member> findMember = memberRepository.findByMemberId(memberId);
         return findMember.map(member ->
-            MemberInfoDto.builder()
-                    .memberCode(member.getMemberCode())
-                    .memberId(member.getMemberId())
-                    .memberName(member.getMemberName())
-                    .memberEmail(member.getMemberEmail())
-                    .memberTel(member.getMemberTel())
-                    .memberStudentNumber(member.getMemberStudentNumber())
-                    .memberRegDate(member.getMemberRegDate())
-                    .memberBirthDate(member.getMemberBirthDate())
-                    .memberSex(member.isMemberSex())
-                    .build())
-        .switchIfEmpty(Mono.empty());
+                        MemberInfoDto.builder()
+                                .memberCode(member.getMemberCode())
+                                .memberId(member.getMemberId())
+                                .memberName(member.getMemberName())
+                                .memberEmail(member.getMemberEmail())
+                                .memberTel(member.getMemberTel())
+                                .memberStudentNumber(member.getMemberStudentNumber())
+                                .memberRegDate(member.getMemberRegDate())
+                                .memberBirthDate(member.getMemberBirthDate())
+                                .memberSex(member.isMemberSex())
+                                .build())
+                .switchIfEmpty(Mono.empty());
+    }
+    public Mono<List<String>> getRoomIds(String memberId) {
+        return memberRepository.findByMemberId(memberId) // memberId로 Member 찾기
+                .map(Member::getRoomIds) // Member 객체에서 roomIds 가져오기
+                .defaultIfEmpty(Collections.emptyList()); // Member가 없을 경우 빈 리스트 반환
+    }
+
+    public Flux<List<String>> getRoomIdsFlux(String memberId) {
+        return roomIdChangeEventPublisher
+                .filter(changeEvent -> changeEvent.getMemberId().equals(memberId)) // 특정 멤버의 이벤트 필터링
+                .flatMap(changeEvent -> memberRepository.findByMemberId(memberId) // 변경된 멤버의 방 ID 목록 가져오기
+                        .map(Member::getRoomIds)); // 방 ID 목록 반환
+    }
+
+
+    public Mono<Void> addRoomIdToMember(String memberId, String roomId) {
+        return memberRepository.findByMemberId(memberId)
+                .flatMap(member -> {
+                    member.getRoomIds().add(roomId); // 방 ID 추가
+                    return memberRepository.save(member); // 업데이트된 멤버 저장
+                })
+                .then(); // Mono<Void> 반환
     }
 }

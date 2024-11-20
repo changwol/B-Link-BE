@@ -1,6 +1,9 @@
 package com.blink.server.board.controller;
 
 import com.blink.server.board.dto.*;
+import com.blink.server.board.dto.BoardDeleteDto;
+import com.blink.server.board.dto.BoardDetailResponseDto;
+import com.blink.server.board.dto.BoardPostDto;
 import com.blink.server.board.service.BoardService;
 import com.blink.server.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
@@ -40,6 +44,34 @@ public class BoardController {
         return boardService.postBoard(dto, userId)
                 .then(Mono.just(ResponseEntity.ok().body("글 작성이 완료되었습니다.")))
                 .doOnError(error -> System.out.println("글 작성 중 오류 발생: " + error.getMessage()));
+    }
+
+    @DeleteMapping("/content")
+    @Operation(summary = "글 삭제하기", description = "게시글 삭제하는 메서드입니다. JWT, BoardCode 와 유저 비밀번호가 필요합니다.")
+    public Mono<ResponseEntity<String>> deleteBoard(@RequestBody BoardDeleteDto dto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = authentication.getName();
+        String userPassword = dto.getMemberPassword();
+
+        return memberService.isThisPasswordMatch(userId, userPassword)
+                .flatMap(isMatch -> {
+                    if (isMatch) {
+                        boardService.deleteBoard(dto.getBoardCode());
+                        return Mono.just(ResponseEntity.ok("글이 성공적으로 삭제되었습니다."));
+                    } else {
+                        return Mono.just(ResponseEntity.status(HttpStatus.FORBIDDEN)
+                                .body("비밀번호가 일치하지 않습니다."));
+                    }
+                });
+    }
+
+    @GetMapping("/content/{id}")
+    @Operation(summary = "글 조회하기" , description = "게시글을 조회하는 메서드입니다. JWT 가 필요하지 않습니다.")
+    public Mono<ResponseEntity<BoardDetailResponseDto>> getBoard(@PathVariable("id") String id) {
+        return boardService.getBoardResponseDto(id)
+                .map(boardDetailResponseDto -> ResponseEntity.ok(boardDetailResponseDto)) // 200 OK와 함께 DTO 반환
+                .switchIfEmpty(Mono.just(ResponseEntity.notFound().build())); // 내용이 없으면 404 반환
+
     }
 
     @DeleteMapping("/content")

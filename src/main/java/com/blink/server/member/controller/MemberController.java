@@ -85,8 +85,10 @@ public class MemberController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
         System.out.println("userId = " + userId);
+
         return memberService.getMemberInfomation(userId)
                 .map(memberInfo -> ResponseEntity.ok(memberInfo))
                 .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
     }
+
 }

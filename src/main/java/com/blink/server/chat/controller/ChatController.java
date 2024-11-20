@@ -53,7 +53,7 @@ public class ChatController {
     }//클라송신
 
     @GetMapping("/rooms/{roomId}/findMessage")
-    public Mono<ResponseEntity<?>> getMessagesByRoomId(@PathVariable String roomId) {
+    public Mono<ResponseEntity<?>> getMessagesByRoomId(@PathVariable Mono<String> roomId) {
         return messageRepository.findByRoomId(roomId)
                 .map(MessageDto::of)
                 .collectList()

@@ -32,6 +32,8 @@ public class Member implements UserDetails {
     private String memberRegDate;
     private String memberBirthDate;
     private boolean memberSex; // 1 man , 0 woman
+    @Getter
+    private List<String> roomIds;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

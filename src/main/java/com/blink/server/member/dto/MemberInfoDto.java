@@ -2,6 +2,8 @@ package com.blink.server.member.dto;
 
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -17,4 +19,5 @@ public class MemberInfoDto {
     private String memberRegDate;
     private String memberBirthDate;
     private boolean memberSex;
+    private List<String> roomId;
 }

@@ -6,20 +6,23 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class MemberSingUpDto {
-    private String userId;
-    private String userPassWord;
-    private String userName;
-    private String userEmail;
-    private String userTel;
-    private String userStudentNumber;
-    private String userRegDate; // yyyymmdd 형식으로 전달
-    private String userBirthDate; // yyyymmdd 형식으로 전달
-    private boolean userSex; // true for men, false for woman
+    private String memberId;
+    private String memberPassWord;
+    private String memberName;
+    private String memberEmail;
+    private String memberTel;
+    private String memberStudentNumber;
+    private String memberRegDate; // yyyymmdd 형식으로 전달
+    private String memberBirthDate; // yyyymmdd 형식으로 전달
+    private boolean memberSex; // true for men, false for woman
+    private List<String> roomIds;
 
     public static MemberSingUpDto of(Member member) {
         return new MemberSingUpDto(
@@ -31,7 +34,8 @@ public class MemberSingUpDto {
                 member.getMemberStudentNumber(),
                 member.getMemberRegDate(),
                 member.getMemberBirthDate(),
-                member.isMemberSex()
+                member.isMemberSex(),
+                member.getRoomIds()
         );
     }
 }
