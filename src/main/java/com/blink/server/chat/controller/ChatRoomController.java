@@ -59,7 +59,6 @@ public class ChatRoomController {
 //                .doOnError(error -> logger.error("Error occurred while retrieving room IDs for memberId {}: {}", memberId, error.getMessage()));
 //    }
 
-
     @PostMapping("/create/{memberId1}/{memberId2}/{roomName}")
     public Mono<ChatRoom> create(@PathVariable String memberId1, @PathVariable String memberId2, @PathVariable String roomName) {
         ChatRoom chatRoom = new ChatRoom();
@@ -74,8 +73,6 @@ public class ChatRoomController {
                 .doOnNext(room -> logger.info("Chat room created: {}", room.getRoomName()))
                 .doOnError(error -> logger.error("Error occurred while creating chat room: {}", error.getMessage()));
     }
-
-
 
 //    @PostMapping("/create/{roomName}")
 //    public Mono<ChatRoom> create(@PathVariable String roomName) {

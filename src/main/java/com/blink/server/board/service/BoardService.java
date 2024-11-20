@@ -39,36 +39,6 @@ public class BoardService {
     }
 
     public void deleteBoard(String boardCode) {
-        System.out.println("boardCode = " + boardCode);
-        ObjectId objectId = new ObjectId(boardCode);
-        boardRepository.deleteByBoardCode(objectId).subscribe();
-    }
-
-    public Mono<BoardDetailResponseDto> getBoardResponseDto(String boardCode) {
-        ObjectId objectId = new ObjectId(boardCode);
-        return boardRepository.findBoardByBoardCode(objectId)
-                .flatMap(board -> {
-                    // 조회된 board 데이터를 기반으로 dto 필드를 설정
-                    BoardDetailResponseDto dto = new BoardDetailResponseDto();
-                    dto.setBoardCode(board.getBoardCode());
-                    dto.setBoardTitle(board.getBoardTitle());
-                    dto.setBoardContent(board.getBoardContent());
-                    dto.setBoardPostDate(board.getBoardPostDate());
-                    dto.setBoardIsAnnouncement(board.isBoardIsAnnouncement());
-
-                    Member member = board.getMember();
-                    dto.setMemberCode(member.getMemberCode());
-                    dto.setMemberId(member.getMemberId());
-
-                    dto.setBoardView(board.getBoardView() + 1);
-
-                    // board view 증가 후 dto 반환
-                    return boardRepository.increaseView(objectId)
-                            .then(Mono.just(dto));  // view 증가 후 DTO 반환
-                })
-                .switchIfEmpty(Mono.error(new IllegalArgumentException("작성글이 존재하지 않습니다.")));
-    }
-    public void deleteBoard(String boardCode) {
         ObjectId objectId = new ObjectId(boardCode);
         boardRepository.deleteByBoardCode(objectId).subscribe();
     }
@@ -102,7 +72,6 @@ public class BoardService {
                 })
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("작성글이 존재하지 않습니다.")));
     }
-
 
     /**
      * 게시글 목록 가져오는 메서드
