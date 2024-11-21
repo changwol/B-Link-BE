@@ -4,7 +4,6 @@ import com.blink.server.chat.entity.Message;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
 
 @Getter
 @Setter

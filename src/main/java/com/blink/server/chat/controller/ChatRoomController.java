@@ -1,11 +1,9 @@
 package com.blink.server.chat.controller;
 
 import com.blink.server.chat.entity.ChatRoom;
-import com.blink.server.chat.entity.Message;
 import com.blink.server.chat.service.ChatRoomService;
 import com.blink.server.member.dto.MemberInfoDto;
 import com.blink.server.member.service.MemberService;
-import io.swagger.v3.oas.annotations.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
 import java.util.List;
 
 @RestController
