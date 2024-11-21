@@ -5,11 +5,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class RoomIdChangEvent {
+public class RoomIdChangeEvent {
         private String memberId; // 멤버 ID
         private String roomId;    // 방 ID
 
-        public RoomIdChangEvent(String memberId, String roomId) {
+        public RoomIdChangeEvent(String memberId, String roomId) {
             this.memberId = memberId;
             this.roomId = roomId;
         }

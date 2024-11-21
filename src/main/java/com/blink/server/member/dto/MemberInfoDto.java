@@ -19,5 +19,5 @@ public class MemberInfoDto {
     private String memberRegDate;
     private String memberBirthDate;
     private boolean memberSex;
-    private List<String> roomId;
+    private List<String> roomIds;
 }

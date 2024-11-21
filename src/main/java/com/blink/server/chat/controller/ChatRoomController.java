@@ -50,15 +50,6 @@ public class ChatRoomController {
                 .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
     }
 
-    //api완성
-//    @GetMapping("/find/{memberId}")
-//    public Mono<List<String>> findRoomId(@PathVariable String memberId) {
-//        Mono<List<String>> roomIds = memberService.getRoomIds(memberId);
-//
-//        return roomIds.doOnNext(ids -> logger.info("Retrieved Room IDs for memberId {}: {}", memberId, ids))
-//                .doOnError(error -> logger.error("Error occurred while retrieving room IDs for memberId {}: {}", memberId, error.getMessage()));
-//    }
-
     @PostMapping("/create/{memberId1}/{memberId2}/{roomName}")
     public Mono<ChatRoom> create(@PathVariable String memberId1, @PathVariable String memberId2, @PathVariable String roomName) {
         ChatRoom chatRoom = new ChatRoom();
@@ -73,25 +64,13 @@ public class ChatRoomController {
                 .doOnNext(room -> logger.info("Chat room created: {}", room.getRoomName()))
                 .doOnError(error -> logger.error("Error occurred while creating chat room: {}", error.getMessage()));
     }
+}
 
-//    @PostMapping("/create/{roomName}")
-//    public Mono<ChatRoom> create(@PathVariable String roomName) {
-//        ChatRoom chatRoom = new ChatRoom();
-//        chatRoom.setRoomName(roomName);
-//
-//        return chatRoomService.save(chatRoom)
-//                .doOnNext(room -> logger.info("Chat room created: {}", room.getRoomName()))
-//                .doOnError(error -> logger.error("Error occurred while creating chat room: {}", error.getMessage()));
-//    }
-
-
+//api완성
 //    @GetMapping("/find/{memberId}")
 //    public Mono<List<String>> findRoomId(@PathVariable String memberId) {
-//        Mono<List<String>> roomIds = memberService.getRoomId(memberId);
-//        return roomIds;
-//        return roomIds.flatMapMany(roomId ->
-//                chatRoomService.findChatRoomByRoomId(roomIds)
-//                        .doOnNext(message -> logger.info("Retrieved Message: {}", message)) // 로그 출력
-//        ).doOnError(error -> logger.error("Error occurred: {}", error.getMessage())); // 에러 로그 출력
+//        Mono<List<String>> roomIds = memberService.getRoomIds(memberId);
+//
+//        return roomIds.doOnNext(ids -> logger.info("Retrieved Room IDs for memberId {}: {}", memberId, ids))
+//                .doOnError(error -> logger.error("Error occurred while retrieving room IDs for memberId {}: {}", memberId, error.getMessage()));
 //    }
-}

@@ -25,7 +25,6 @@ public class ChatController {
     private final SimpMessageSendingOperations template;
     private final MessageService messageService;
     private final ChatRoomService chatRoomService;
-//    private final RoomRepository roomRepository;
     private final MessageRepository messageRepository;
 
     @MessageMapping("/message/rooms/{roomId}")
@@ -62,7 +61,9 @@ public class ChatController {
                         : ResponseEntity.ok(messages))//200
                 .defaultIfEmpty(ResponseEntity.notFound().build()); // 예외 처리
     }//지금까지 저장된 데이터
-    //채팅
+}
+
+//채팅
 //    @PostMapping("/chat/create")
 //    public ChatRoomDto createChatRoom(@RequestBody ChatRoomDto chatRoomDto) {
 //        return chatRoomService.createChatRoom(chatRoomDto);
@@ -71,4 +72,3 @@ public class ChatController {
 //    public Optional<ChatRoom> getAllChatRooms(@PathVariable String userId) {
 //        return chatRoomService.getChatRoom(userId); // 특정 roomId로 채팅 방 반환
 //    }
-}

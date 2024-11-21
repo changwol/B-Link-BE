@@ -4,23 +4,23 @@ import com.blink.server.chat.entity.Message;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
 
 @Getter
+@Setter
 @NoArgsConstructor
 public class MessageDto {
 
-    @Setter
-    private String roomId;
-    @Setter
     private String id;
-    @Setter
+    private String roomId;
     private String senderName;
-    @Setter
+    private String senderId;
     private String content;
 
-    public MessageDto(String roomId, String name, String content) {
+    public MessageDto(String roomId, String name,String senderId, String content) {
         this.roomId = roomId;
         this.senderName = name;
+        this.senderId = senderId;
         this.content = content;
     }
 
@@ -28,6 +28,7 @@ public class MessageDto {
         return new MessageDto(
                 message.getRoomId(),
                 message.getSenderName(),
+                message.getSenderId(),
                 message.getContent()
         );
     }

@@ -1,6 +1,6 @@
 package com.blink.server.member.service;
 
-import com.blink.server.chat.event.RoomIdChangEvent;
+import com.blink.server.chat.event.RoomIdChangeEvent;
 import com.blink.server.jwt.JwToken;
 import com.blink.server.jwt.JwTokenProvider;
 import com.blink.server.member.dto.MemberInfoDto;
@@ -38,7 +38,7 @@ public class MemberService {
     private final JwTokenProvider jwTokenProvider;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    private final FluxProcessor<RoomIdChangEvent,RoomIdChangEvent> roomIdChangeEventPublisher =
+    private final FluxProcessor<RoomIdChangeEvent,RoomIdChangeEvent> roomIdChangeEventPublisher =
             DirectProcessor.create();
 
 

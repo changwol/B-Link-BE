@@ -8,25 +8,24 @@ import java.time.LocalDateTime;
 
 @Document(collection = "chat") // 실제 몽고 DB 컬렉션 이름
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Message {
     @Id
     private String id;
-    @Setter
     private String roomId;
-    @Setter
     private String content;
-    @Setter
     private String senderName;
-    @Setter
+    private String senderId;
     private LocalDateTime createdDate;
 
-    public Message(String roomId, String content, String senderName) {
+    public Message(String roomId, String content, String senderName, String senderId) {
         this.roomId = roomId;
         this.content = content;
         this.senderName = senderName;
+        this.senderId = senderId;
         this.createdDate = LocalDateTime.now();
     }
 }
