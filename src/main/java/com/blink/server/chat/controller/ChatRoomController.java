@@ -2,7 +2,6 @@ package com.blink.server.chat.controller;
 
 import com.blink.server.chat.entity.ChatRoom;
 import com.blink.server.chat.service.ChatRoomService;
-import com.blink.server.member.dto.MemberInfoDto;
 import com.blink.server.member.service.MemberService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,14 +36,12 @@ public class ChatRoomController {
     }
 
     @GetMapping("/memberId")
-    public Mono<ResponseEntity<MemberInfoDto>> getMemberInfomation() {
+    public Mono<ResponseEntity<String>> getMemberInfomation() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
         System.out.println("userId = " + userId);
 
-        return memberService.getMemberInfomation(userId)
-                .map(memberInfo -> ResponseEntity.ok(memberInfo))
-                .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
+        return Mono.just(ResponseEntity.ok(userId));
     }
 
     @PostMapping("/create/{memberId1}/{memberId2}/{roomName}")
