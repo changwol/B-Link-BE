@@ -120,6 +120,7 @@ public class MemberService {
                                 .build())
                 .switchIfEmpty(Mono.empty());
     }
+
     public Mono<List<String>> getRoomIds(String memberId) {
         return memberRepository.findByMemberId(memberId) // memberId로 Member 찾기
                 .map(Member::getRoomIds) // Member 객체에서 roomIds 가져오기

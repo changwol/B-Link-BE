@@ -9,4 +9,5 @@ import reactor.core.publisher.Mono;
 public interface ChatRoomRepository extends ReactiveCrudRepository<ChatRoom, String> {
     Mono<ChatRoom> findById(String roomId);
     Mono<ChatRoom> save(ChatRoom chatRoom);
+    Mono<ChatRoom> getRoomNameById(String roomId);
 }
