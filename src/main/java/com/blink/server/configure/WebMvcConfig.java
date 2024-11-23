@@ -13,6 +13,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addMapping("/**") // 모든 엔드포인트에 대해 CORS 허용
                 .allowedOrigins(frontServerUrl,Url2) // React 애플리케이션의 URL을 허용
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // 허용할 HTTP 메서드
-                .allowedHeaders("*"); // 모든 헤더 허용
+                .allowedHeaders("*")
+                .allowCredentials(true); // 모든 헤더 허용
     }
 }//첫 대화 가져오기

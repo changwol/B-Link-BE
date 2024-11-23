@@ -10,4 +10,5 @@ public interface ChatRoomRepository extends ReactiveCrudRepository<ChatRoom, Str
     Mono<ChatRoom> findById(String roomId);
     Mono<ChatRoom> save(ChatRoom chatRoom);
     Mono<ChatRoom> getRoomNameById(String roomId);
+
 }

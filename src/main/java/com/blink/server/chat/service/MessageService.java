@@ -24,7 +24,9 @@ public class MessageService {
         message.setRoomId(chat.getRoomId());
         message.setContent(chat.getContent());
         message.setSenderName(chat.getSenderName());
+        message.setSenderId(chat.getSenderId());
         message.setCreatedDate(LocalDateTime.now());
         return messageRepository.save(message);//몽고 저장
     }
+
 }

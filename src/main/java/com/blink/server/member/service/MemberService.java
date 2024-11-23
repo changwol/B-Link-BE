@@ -143,4 +143,7 @@ public class MemberService {
                 })
                 .then(); // Mono<Void> 반환
     }
+    void updateRoomIdToMember(String memberId, String roomId) {
+        memberRepository.findByMemberId(memberId).map(Member::getRoomIds);
+    }
 }
