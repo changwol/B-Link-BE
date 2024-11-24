@@ -21,6 +21,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @RequestMapping("/member")
 @Tag(name = "Member", description = "사용자 관련 API 입니다.")
+@CrossOrigin(origins = {"http://localhost:3000","http://127.0.0.1:3000"})
 public class MemberController {
 
     private final MemberService memberService;

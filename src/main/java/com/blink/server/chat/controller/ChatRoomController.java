@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/room")
-@CrossOrigin("http://127.0.0.1:3000")
+@CrossOrigin(origins = {"http://localhost:3000","http://127.0.0.1:3000"})
 public class ChatRoomController {
 
     private static final Logger logger = LoggerFactory.getLogger(ChatRoomController.class);
@@ -48,17 +48,17 @@ public class ChatRoomController {
         this.messagingTemplate = messagingTemplate; // 메시징 템플릿 주입
     }
 
-    @MessageMapping("/find/{memberId}")
-    @SendTo("/topic/find")
-    public Mono<List<RoomInfo>> findRoomId(@DestinationVariable String memberId, Principal principal) {
-        logger.info("findRoomId 호출됨, memberId: {}", memberId); // 로그 추가
-        return chatRoomService.getRoomNamesByMemberId(memberId)
-                .doOnNext(roomInfos -> logger.info("Retrieved Room Info for memberId {}: {}", memberId, roomInfos))
-                .doOnError(error -> {
-                    logger.error("Error occurred while retrieving room info for memberId {}: {}", memberId, error.getMessage());
-                })
-                .defaultIfEmpty(Collections.emptyList());
-    }
+//    @MessageMapping("/find/{memberId}")
+//    @SendTo("/sub/find")
+//    public Mono<List<RoomInfo>> findRoomId(@DestinationVariable String memberId, Principal principal) {
+//        logger.info("findRoomId 호출됨, memberId: {}", memberId); // 로그 추가
+//        return chatRoomService.getRoomNamesByMemberId(memberId)
+//                .doOnNext(roomInfos -> logger.info("Retrieved Room Info for memberId {}: {}", memberId, roomInfos))
+//                .doOnError(error -> {
+//                    logger.error("Error occurred while retrieving room info for memberId {}: {}", memberId, error.getMessage());
+//                })
+//                .defaultIfEmpty(Collections.emptyList());
+//    }
 
 
 
@@ -78,38 +78,18 @@ public class ChatRoomController {
         return Mono.just(ResponseEntity.ok(userId));
     }
 
-    @MessageMapping("/create")
-    public Mono<ChatRoom> create(@RequestBody CreateChatRequest request) {
-        String memberId1 = request.getMemberId1();
-        String memberId2 = request.getMemberId2();
-        String roomName = request.getRoomName();
-
-        ChatRoom chatRoom = new ChatRoom();
-        chatRoom.setRoomName(roomName);
-        System.out.println("roomName = " + roomName);
-
-        return chatRoomService.save(chatRoom)
-                .flatMap(savedRoom -> {
-                    return memberService.addRoomIdToMember(memberId1, savedRoom.getId())
-                            .then(memberService.addRoomIdToMember(memberId2, savedRoom.getId()))
-                            .then(Mono.just(savedRoom)); // 방 ID 추가 후 저장된 방 반환
-                })
-                .flatMap(savedRoom -> {
-                    return chatRoomService.updateRoomId(memberId1, memberId2, savedRoom.getId())
-                            .then(Mono.just(savedRoom)); // 업데이트 후 방 반환
-                })
-                .doOnNext(room -> {
-                    logger.info("Chat room created: {}", room.getRoomName());
-                    // 방 생성 후 사용자에게 방 정보 전송
-                    messagingTemplate.convertAndSend("/topic/find", room);
-                })
-                .doOnError(error -> logger.error("Error occurred while creating chat room: {}", error.getMessage()));
-    }
-//    @MessageMapping("/create/{memberId1}/{memberId2}/{roomName}")
-//    public Mono<ChatRoom> create(@PathVariable String memberId1, @PathVariable String memberId2, @PathVariable String roomName) {
+//    @MessageMapping("/create")
+//    public Mono<ChatRoom> create(@RequestBody CreateChatRequest request) {
+//        System.out.println("roomName = " + request);
+//
+//        String memberId1 = request.getMemberId1();
+//        String memberId2 = request.getMemberId2();
+//        String roomName = request.getRoomName();
+//
 //        ChatRoom chatRoom = new ChatRoom();
 //        chatRoom.setRoomName(roomName);
 //        System.out.println("roomName = " + roomName);
+//
 //        return chatRoomService.save(chatRoom)
 //                .flatMap(savedRoom -> {
 //                    return memberService.addRoomIdToMember(memberId1, savedRoom.getId())
@@ -127,6 +107,29 @@ public class ChatRoomController {
 //                })
 //                .doOnError(error -> logger.error("Error occurred while creating chat room: {}", error.getMessage()));
 //    }
+
+    @MessageMapping("/create/{memberId1}/{memberId2}/{roomName}")
+    public Mono<ChatRoom> create(@PathVariable String memberId1, @PathVariable String memberId2, @PathVariable String roomName) {
+        ChatRoom chatRoom = new ChatRoom();
+        chatRoom.setRoomName(roomName);
+        System.out.println("roomName = " + roomName);
+        return chatRoomService.save(chatRoom)
+                .flatMap(savedRoom -> {
+                    return memberService.addRoomIdToMember(memberId1, savedRoom.getId())
+                            .then(memberService.addRoomIdToMember(memberId2, savedRoom.getId()))
+                            .then(Mono.just(savedRoom)); // 방 ID 추가 후 저장된 방 반환
+                })
+                .flatMap(savedRoom -> {
+                    return chatRoomService.updateRoomId(memberId1, memberId2, savedRoom.getId())
+                            .then(Mono.just(savedRoom)); // 업데이트 후 방 반환
+                })
+                .doOnNext(room -> {
+                    logger.info("Chat room created: {}", room.getRoomName());
+                    // 방 생성 후 사용자에게 방 정보 전송
+                    messagingTemplate.convertAndSend("/sub/find", room);
+                })
+                .doOnError(error -> logger.error("Error occurred while creating chat room: {}", error.getMessage()));
+    }
 }
 
 //@PostMapping("/create/{memberId1}/{memberId2}/{roomName}")

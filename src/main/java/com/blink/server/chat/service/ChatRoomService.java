@@ -41,10 +41,10 @@ public class ChatRoomService {
         this.mongoTemplate = mongoTemplate;
     }
 
-    public Flux<Message> findChatRoomByRoomId(String roomId) {
-        return messageRepository.findByRoomId(roomId) // roomId로 ChatRoom 조회
-                .switchIfEmpty(Mono.error(new RuntimeException("ChatRoom not found"))); // 방이 없을 경우 에러 처리
-    }
+//    public Flux<Message> findChatRoomByRoomId(String> roomId) {
+//        return messageRepository.findByRoomId(roomId) // roomId로 ChatRoom 조회
+//                .switchIfEmpty(Mono.error(new RuntimeException("ChatRoom not found"))); // 방이 없을 경우 에러 처리
+//    }
 
 //    public Mono<Void> updateRoomId(String memberId1, String memberId2, String newRoomId) {
 //        return memberService.getRoomIds(memberId1)
