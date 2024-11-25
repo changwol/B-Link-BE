@@ -76,6 +76,7 @@ public class BoardController {
     }
 
     @PutMapping("/update")
+    @Operation(summary = "게시글 수정하기", description = "게시글 수정하는 메서드입니다.")
     public ResponseEntity<Mono<String>> updateBoard(@RequestBody BoardUpdateDto dto) {
         return ResponseEntity.ok(boardService.updateBoard(dto));
 
