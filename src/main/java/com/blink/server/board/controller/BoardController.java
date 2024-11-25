@@ -9,23 +9,18 @@ import com.blink.server.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
-import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/board")
 @Tag(name = "board", description = "게시판 관련 API")
+@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000"})
 public class BoardController {
     private final BoardService boardService;
     private final MemberService memberService;
@@ -78,5 +73,11 @@ public class BoardController {
     @Operation(summary = "게시글 목록보기", description = "게시글 목록을 불러오는 메서드입니다. 파라미터로 몇번째 page 를 조회할건지 보내야합니다.")
     public Mono<ResponseEntity<BoardListResponseDto>> getBoardContentList(@RequestParam int page) {
         return Mono.just(ResponseEntity.ok(boardService.getBoardList(page)));
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<Mono<String>> updateBoard(@RequestBody BoardUpdateDto dto) {
+        return ResponseEntity.ok(boardService.updateBoard(dto));
+
     }
 }

@@ -1,10 +1,7 @@
 package com.blink.server.board.service;
 
-import com.blink.server.board.dto.BoardListInformationDto;
+import com.blink.server.board.dto.*;
 import com.blink.server.board.dto.BoardDetailResponseDto;
-import com.blink.server.board.dto.BoardListResponseDto;
-import com.blink.server.board.dto.BoardDetailResponseDto;
-import com.blink.server.board.dto.BoardPostDto;
 import com.blink.server.board.entity.Board;
 import com.blink.server.board.repository.BoardRepository;
 import com.blink.server.member.entity.Member;
@@ -12,9 +9,11 @@ import com.blink.server.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -100,6 +99,23 @@ public class BoardService {
 
         // boardListFlux가 Flux<BoardListInformationDto>이므로 이를 Mono로 묶고, count와 함께 반환
         return new BoardListResponseDto(count, list);
+    }
+
+    /**
+     * 글 수정하는 메서드
+     */
+    public Mono<String> updateBoard(BoardUpdateDto dto) {
+        System.out.println("dto = " + dto);
+        Mono<Board> board = boardRepository.findBoardByBoardCode(new ObjectId(dto.getBoardCode()));
+        return board.flatMap(
+                newBoard -> {
+                    newBoard.setBoardTitle(dto.getBoardTitle());
+                    newBoard.setBoardContent(dto.getBoardContent());
+                    newBoard.setBoardPostDate(LocalDateTime.now().toString());
+                    return boardRepository.save(newBoard)
+                            .thenReturn("수정이 완료되었습니다.");
+                })
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("작성글이 존재하지 않습니다.")));
     }
 
 }

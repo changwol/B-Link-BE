@@ -91,5 +91,4 @@ public class MemberController {
                 .map(memberInfo -> ResponseEntity.ok(memberInfo))
                 .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
     }
-
 }
