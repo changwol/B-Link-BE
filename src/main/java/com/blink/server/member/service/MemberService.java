@@ -38,7 +38,7 @@ public class MemberService {
     private final JwTokenProvider jwTokenProvider;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    private final FluxProcessor<RoomIdChangeEvent,RoomIdChangeEvent> roomIdChangeEventPublisher =
+    private final FluxProcessor<RoomIdChangeEvent, RoomIdChangeEvent> roomIdChangeEventPublisher =
             DirectProcessor.create();
 
 
@@ -48,6 +48,7 @@ public class MemberService {
 
     /**
      * 회원가입
+     *
      * @param dto 회원가입 위한 DTO
      * @return
      */
@@ -55,6 +56,7 @@ public class MemberService {
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
     String formattedDate = today.format(formatter);
+
     public Mono<Member> saveUser(MemberSingUpDto dto) {
         Member member = new Member();
         member.setMemberId(dto.getMemberId());
@@ -85,6 +87,7 @@ public class MemberService {
 
     /**
      * 로그인 하는 메서드, 로그인 성공시 JWT 토큰 반환
+     *
      * @param userName user ID
      * @param password user PassWord
      * @return JWT 토큰 반환
@@ -98,12 +101,13 @@ public class MemberService {
         return jwToken;
     }
 
-    public Mono<Boolean> isThisPasswordMatch(String memberId ,String memberPassword) {
+    public Mono<Boolean> isThisPasswordMatch(String memberId, String memberPassword) {
         Mono<Member> findMember = memberRepository.findByMemberId(memberId);
         return findMember.map(member -> bCryptPasswordEncoder.matches(memberPassword, member.getMemberPassWord()))
                 .switchIfEmpty(Mono.just(false));
 
     }
+
     public Mono<MemberInfoDto> getMemberInfomation(String memberId) {
         Mono<Member> findMember = memberRepository.findByMemberId(memberId);
         return findMember.map(member ->
@@ -143,7 +147,20 @@ public class MemberService {
                 })
                 .then(); // Mono<Void> 반환
     }
+
     void updateRoomIdToMember(String memberId, String roomId) {
         memberRepository.findByMemberId(memberId).map(Member::getRoomIds);
+    }
+
+    public Mono<String> findMemberById(String userId) {
+        return memberRepository.findByMemberId(userId).map(Member::getMemberName);
+    }
+
+    public Flux<Object> getMemberName(String memberId) {
+        return memberRepository.findByMemberName(memberId).map(Member::getMemberName);
+    }
+
+    public Flux<Member> getMemberNameList(String memberName) {
+        return memberRepository.findByMemberNameContainingIgnoreCase(memberName);
     }
 }

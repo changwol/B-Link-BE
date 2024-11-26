@@ -22,5 +22,9 @@ public interface MemberRepository extends ReactiveCrudRepository<Member, String>
 
     Mono<Member> findByRoomIds(String memberId);
 
+    Flux<Member> findByMemberName(String memberId);
+
+    Flux<Member> findByMemberNameContainingIgnoreCase(String memberName);
+
 //    List<String> getRoomIds(String memberId);
 }

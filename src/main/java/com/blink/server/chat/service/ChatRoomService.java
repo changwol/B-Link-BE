@@ -1,8 +1,8 @@
 package com.blink.server.chat.service;
 
+import com.blink.server.chat.dto.ChatRoomDto;
 import com.blink.server.chat.dto.RoomInfo;
 import com.blink.server.chat.entity.ChatRoom;
-import com.blink.server.chat.entity.Message;
 import com.blink.server.chat.repository.ChatRoomRepository;
 import com.blink.server.chat.repository.MessageRepository;
 import com.blink.server.member.entity.Member;
@@ -18,8 +18,13 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class ChatRoomService {
@@ -154,7 +159,6 @@ public class ChatRoomService {
         Query query = new Query();
         query.addCriteria(Criteria.where("roomName").is(roomName));
 
-        // 방 정보를 조회
         return Mono.fromCallable(() -> mongoTemplate.findOne(query, ChatRoom.class)) // 비동기적으로 조회
                 .map(room -> {
                     if (room == null) {
@@ -164,4 +168,46 @@ public class ChatRoomService {
                 });
     }
 
+    public Flux<Object> getMemberNameByMemberId(String memberId) {
+        return memberService.getMemberName(memberId);
+    }
+
+    //    public Flux<Member> getFilteredRooms(String memberId, String searchTerm) {
+//        return memberRepository.findByMemberName(memberId)
+//                .flatMap(member -> {
+//                    // member의 이름과 비교하여 방 정보를 필터링
+//                    return memberRepository.findByMemberName(memberId)
+//                            .filter(roomInfo -> roomInfo.getMemberName().toLowerCase().contains(searchTerm.toLowerCase()));
+//                });
+//    }
+    public Flux<Member> getFilteredMemberInfo(String memberName, String searchTerm) {
+        System.out.println("searchTerm : " + searchTerm);
+        System.out.println("memberName : " + memberName);
+        return memberRepository.findByMemberName(memberName)
+                .doOnNext(member -> System.out.println("Found member: {}"+ member)) // memberId로 사용자를 찾습니다.
+
+                .flatMap(member -> {
+                    // 사용자의 이름이 검색어에 포함되는지 확인
+                    if (member.getMemberName().toLowerCase().contains(searchTerm.toLowerCase())) {
+                        return Flux.just(member); // 검색어에 맞는 사용자 반환
+                    } else {
+                        return Flux.empty(); // 검색어에 맞지 않으면 빈 Flux 반환
+                    }
+                })
+                .switchIfEmpty(Flux.error(new RuntimeException("Member not found or does not match search term"))); // 사용자가 없거나 일치하지 않는 경우
+    }
+
+
+    public Mono<ChatRoom> createRoom(ChatRoomDto room) {
+        ChatRoom chatRoom = new ChatRoom();
+        chatRoom.setRoomName(room.getRoomName());
+        chatRoom.setMember1(room.getMember1());
+        chatRoom.setMember2(room.getMember2());
+        chatRoom.getLastchatTime();
+        return chatRoomRepository.save(chatRoom);
+    }
+
+//    public Flux<Member> getMemberName(String searchTerm) {
+//        return memberRepository.findByMemberNameContainingIgnoreCase(searchTerm);
+//    }
 }

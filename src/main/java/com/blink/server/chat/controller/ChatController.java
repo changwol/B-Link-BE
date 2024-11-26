@@ -44,6 +44,7 @@ public class ChatController {
 
     @MessageMapping("/message")
     public Mono<Void> sendMessage(@Payload MessageDto messageDto) {
+        System.out.println("messageDto = " + messageDto.getSenderId());
         return messageService.saveChatMessage(messageDto)
                 .map(savedMessage -> MessageDto.of(savedMessage))
                 .doOnNext(savedMessageDto -> {
