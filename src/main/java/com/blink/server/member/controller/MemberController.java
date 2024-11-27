@@ -1,5 +1,6 @@
 package com.blink.server.member.controller;
 
+import com.blink.server.board.dto.BoardPostDto;
 import com.blink.server.jwt.JwToken;
 import com.blink.server.member.dto.MemberInfoDto;
 import com.blink.server.member.dto.MemberLoginDto;
@@ -36,6 +37,11 @@ public class MemberController {
         return handleMessage(dto)
                 .map(savedMessage -> ResponseEntity.status(HttpStatus.CREATED).body(savedMessage))
                 .defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
+    }
+
+    @PostMapping("/idCheck")
+    public Mono<Boolean> validIdCheck(@RequestParam String memberId) {
+        return memberService.validIdCheck(memberId);
     }
 
     private Mono<MemberSingUpDto> handleMessage(MemberSingUpDto messageDto) {

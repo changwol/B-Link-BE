@@ -1,10 +1,7 @@
 package com.blink.server.member.dto;
 
 import com.blink.server.member.entity.Member;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -12,6 +9,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class MemberSingUpDto {
     private String memberId;
     private String memberPassWord;

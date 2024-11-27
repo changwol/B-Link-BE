@@ -41,9 +41,10 @@ public class MemberService {
     private final FluxProcessor<RoomIdChangeEvent, RoomIdChangeEvent> roomIdChangeEventPublisher =
             DirectProcessor.create();
 
-
-    public boolean canUseThisUserId(String userId) {
-        return true; // DB 조회해서 구현 필요
+    public Mono<Boolean> validIdCheck(String userId) {
+        return memberRepository.findByMemberId(userId)
+                .hasElement() // 값이 존재하는지 확인
+                .map(exists -> !exists); // 존재하면 false, 없으면 true
     }
 
     /**
@@ -52,12 +53,13 @@ public class MemberService {
      * @param dto 회원가입 위한 DTO
      * @return
      */
-    LocalDate today = LocalDate.now();
-
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-    String formattedDate = today.format(formatter);
-
     public Mono<Member> saveUser(MemberSingUpDto dto) {
+        System.out.println("dto = " + dto);
+        LocalDate today = LocalDate.now();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String formattedDate = today.format(formatter);
+
         Member member = new Member();
         member.setMemberId(dto.getMemberId());
         member.setMemberPassWord(bCryptPasswordEncoder.encode(dto.getMemberPassWord()));
@@ -67,7 +69,8 @@ public class MemberService {
         member.setMemberStudentNumber(String.valueOf(dto.getMemberStudentNumber()));
         member.setMemberRegDate(formattedDate);
         member.setMemberBirthDate(dto.getMemberBirthDate());
-        member.setRoomIds(Collections.singletonList(dto.getRoomIds().toString()));
+        List<String> roomIdList = new ArrayList<>();
+        member.setRoomIds(roomIdList);
         member.setMemberSex(dto.isMemberSex());
         List<String> roles = new ArrayList<>();
         roles.add("member_student");
