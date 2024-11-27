@@ -19,6 +19,8 @@ public class ChatRoom {
     private String id;
     private String roomName;
     private String member1;
+    private String member1Id;
     private String member2;
+    private String member2Id;
     private LocalDateTime lastchatTime;
 }

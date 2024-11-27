@@ -138,15 +138,43 @@ public class MemberService {
                         .map(Member::getRoomIds)); // 방 ID 목록 반환
     }
 
-
-    public Mono<Void> addRoomIdToMember(String memberId, String roomId) {
+    public Mono<Void> addRoomIdToMember(String memberId, Mono<String> roomIdMono) {
         return memberRepository.findByMemberId(memberId)
                 .flatMap(member -> {
-                    member.getRoomIds().add(roomId); // 방 ID 추가
-                    return memberRepository.save(member); // 업데이트된 멤버 저장
+                    // 방 ID를 Mono로 받아서 사용
+                    return roomIdMono.map(roomId -> {
+                                // 방 ID를 List에 추가
+                                member.getRoomIds().add(roomId);
+                                return member;
+                            })
+                            .flatMap(updatedMember -> memberRepository.save(updatedMember)); // 업데이트된 멤버 저장
                 })
                 .then(); // Mono<Void> 반환
     }
+//    백업 public Mono<Void> addRoomIdToMember(String memberId, Mono<String> roomIdMono) {
+//        return memberRepository.findByMemberId(memberId)
+//                .flatMap(member -> {
+//                    // 방 ID를 Mono로 받아서 사용
+//                    return roomIdMono.map(roomId -> {
+//                                // 방 ID를 List에 추가
+//                                member.getRoomIds().add(roomId);
+//                                return member;
+//                            })
+//                            .flatMap(updatedMember -> memberRepository.save(updatedMember)); // 업데이트된 멤버 저장
+//                })
+//                .then(); // Mono<Void> 반환
+//    }
+//    public Mono<Void> addRoomIdToMember(String memberId, Mono<String> roomId) {
+//        Mono<List<String>> tmp=memberRepository.findByRoomIds(memberId).map(Member::getRoomIds);
+//        System.out.println(tmp);
+//        memberRepository.findByMemberId(memberId)
+//                .doOnNext(member -> {
+//                    System.out.println("do on next"+member.getRoomIds());
+//                    member.getRoomIds().add(String.valueOf(roomId)); // 방 ID 추가
+//                    memberRepository.save(member); // 업데이트된 멤버 저장
+//                });
+//        return null;
+//    }
 
     void updateRoomIdToMember(String memberId, String roomId) {
         memberRepository.findByMemberId(memberId).map(Member::getRoomIds);

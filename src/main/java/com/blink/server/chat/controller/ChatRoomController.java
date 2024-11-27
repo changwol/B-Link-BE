@@ -26,7 +26,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/room")
-@CrossOrigin(origins = {"http://localhost:3000","http://127.0.0.1:3000"})
+@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000"})
 public class ChatRoomController {
 
     private static final Logger logger = LoggerFactory.getLogger(ChatRoomController.class);
@@ -89,7 +89,6 @@ public class ChatRoomController {
 //        }
 //        return chatRoomService.getMemberName(searchTerm);
 //    }
-
 
 
 //    @GetMapping("/find/{memberId}/findRoom") //완성
@@ -172,31 +171,58 @@ public class ChatRoomController {
 
     @MessageMapping("/create")
     public Mono<Void> createRoom(@Payload ChatRoomDto room) {
-        System.out.println("room = " + room);
-        return chatRoomService.createRoom(room)
-                .doOnNext(createRoom -> {
-                    messagingTemplate.convertAndSend("/sub/find/", createRoom);
-                    messagingTemplate.convertAndSend("/sub/addRoom/"+room.getMember1(), createRoom);
-                    messagingTemplate.convertAndSend("/sub/addRoom/"+room.getMember2(), createRoom);
+        String roomName = room.getRoomName();
+        String member1 = room.getMember1Id();
+        String member2 = room.getMember2Id();
+
+        System.out.println("roomName = " + roomName);
+        System.out.println("member1 = " + member1);
+        System.out.println("member2 = " + member2);
+
+        ChatRoom chatRoom = new ChatRoom();
+        chatRoom.setRoomName(roomName);
+        chatRoom.setMember1Id(member1);
+        chatRoom.setMember2Id(member2);
+        chatRoom.setMember1(member1);
+        chatRoom.setMember2(member2);
+        // ChatRoom 객체를 생성하고, 방을 저장합니다.
+        return chatRoomService.save(chatRoom)
+                .flatMap(savedRoom -> {
+                    // 방 ID를 저장합니다.
+                    String roomId = savedRoom.getId();
+
+                    // 두 멤버에게 방 ID를 추가합니다.
+                    return memberService.addRoomIdToMember(member1, Mono.just(roomId))
+                            .then(memberService.addRoomIdToMember(member2, Mono.just(roomId)))
+                            .then(Mono.just(savedRoom)); // 저장된 방 반환
                 })
-                .then();
+                .doOnNext(savedRoom -> {
+                    chatRoomService.updateRoomId(member1, member2, savedRoom.getId());
+                    messagingTemplate.convertAndSend("/sub/find/", savedRoom);
+                    messagingTemplate.convertAndSend("/sub/addRoom/"+member1, savedRoom);
+                    messagingTemplate.convertAndSend("/sub/addRoom/"+room.getMember2(), savedRoom);
+
+                })
+                .then(); // 최종적으로 Mono<Void> 반환
     }
 
-    @MessageMapping("/addRoom/{memberId}")
-    @SendTo("/sub/addRoom/{memberId}")
-    public Mono<ChatRoomDto> addRoom(@Payload ChatRoomDto room, @DestinationVariable String memberId) {
-        return handleAddRoom(room);
-    }
-    private Mono<ChatRoomDto> handleAddRoom(ChatRoomDto room) {
-        return chatRoomService.createRoom(room)
-                .map(createRoom -> room.of(createRoom))
-                .doOnNext(createRoom->{
-                    messagingTemplate.convertAndSend("/sub/addRoom/"+room.getMember1(), createRoom);
-                    messagingTemplate.convertAndSend("/sub/addRoom/"+room.getMember2(), createRoom);
-                });
-    }
-}
 
+//        return chatRoomService.createRoom(room)
+//                .doOnNext(createRoom -> {
+//                    Mono<String> roomId = chatRoomService.getRoomId(roomName);
+//                    System.out.println("roomId = " + roomId);
+//                    chatRoomService.updateRoomId(member1, member2, roomId);
+//
+//                    messagingTemplate.convertAndSend("/sub/find/", createRoom);
+//                    messagingTemplate.convertAndSend("/sub/addRoom/" + member1, createRoom);
+//                    messagingTemplate.convertAndSend("/sub/addRoom/" + member1, createRoom);
+//                })
+//                .doOnSuccess(aVoid -> {
+//                    // 모든 비동기 작업이 완료된 후 실행
+//                    System.out.println("Adding room for member: " + room.getMember1() + " and " + room.getMember2());
+//                })
+//                .then(); // 최종적으로 Mono<Void> 반환
+//}
 //@PostMapping("/create/{memberId1}/{memberId2}/{roomName}")
 //public Mono<ChatRoom> create(@PathVariable String memberId1, @PathVariable String memberId2, @PathVariable String roomName) {
 //    ChatRoom chatRoom = new ChatRoom();
@@ -213,3 +239,40 @@ public class ChatRoomController {
 //            .doOnNext(room -> logger.info("Chat room created: {}", room.getRoomName()))
 //            .doOnError(error -> logger.error("Error occurred while creating chat room: {}", error.getMessage()));
 //}
+
+//    @MessageMapping("/create")
+//    public Mono<Void> createRoom(@Payload ChatRoomDto room) {
+//        System.out.println("room = " + room);
+//        return chatRoomService.createRoom(room)
+//                .doOnNext(createRoom -> {
+//                    messagingTemplate.convertAndSend("/sub/find/", createRoom);
+//                    messagingTemplate.convertAndSend("/sub/addRoom/"+room.getMember1(), createRoom);
+//                    messagingTemplate.convertAndSend("/sub/addRoom/"+room.getMember2(), createRoom);
+//
+//                    Mono<String> roomId = chatRoomService.getRoomId(createRoom.getId());
+//                    String memberId = room.getMember1Id();
+//                    System.out.println("memberId = " + memberId);
+//                    memberService.addRoomIdToMember(memberId,roomId.toString());
+//
+//                    System.out.println("Adding room for member: " + room.getMember1() + " and " + room.getMember2());
+//                })
+//                .then();
+//    }
+
+    @MessageMapping("/addRoom/{memberId}")
+    @SendTo("/sub/addRoom/{memberId}")
+    public Mono<ChatRoomDto> addRoom(@Payload ChatRoomDto room) {
+        System.out.println("Adding room for member: " + room.getMember1() + " and " + room.getMember2());
+        return handleAddRoom(room);
+    }
+
+    private Mono<ChatRoomDto> handleAddRoom(ChatRoomDto room) {
+        return chatRoomService.createRoom(room)
+                .map(createRoom -> room.of(createRoom))
+                .doOnNext(createRoom -> {
+                    messagingTemplate.convertAndSend("/sub/addRoom/" + room.getMember1(), createRoom);
+                    messagingTemplate.convertAndSend("/sub/addRoom/" + room.getMember2(), createRoom);
+                });
+    }
+}
+

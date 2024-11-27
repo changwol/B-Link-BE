@@ -202,7 +202,9 @@ public class ChatRoomService {
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.setRoomName(room.getRoomName());
         chatRoom.setMember1(room.getMember1());
+        chatRoom.setMember1Id(room.getMember1Id());
         chatRoom.setMember2(room.getMember2());
+        chatRoom.setMember2Id(room.getMember2Id());
         chatRoom.getLastchatTime();
         return chatRoomRepository.save(chatRoom);
     }
