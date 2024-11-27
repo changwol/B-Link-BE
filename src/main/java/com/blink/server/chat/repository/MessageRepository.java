@@ -10,4 +10,5 @@ import reactor.core.publisher.Mono;
 public interface MessageRepository extends ReactiveCrudRepository<Message, Long> {
     Flux<Message> findBySenderName(String senderName);
     Flux<Message> findByRoomId(String roomId);
+//    Flux<Message> findByRoomId(String id);
 }

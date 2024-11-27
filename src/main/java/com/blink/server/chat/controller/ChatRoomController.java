@@ -101,6 +101,7 @@ public class ChatRoomController {
     @GetMapping("/memberId")
     public Mono<ResponseEntity<String>> getMemberId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("authentication = " + authentication);
         String userId = authentication.getName();
         System.out.println("userId = " + userId);
 
