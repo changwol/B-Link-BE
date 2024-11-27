@@ -4,6 +4,7 @@ import com.blink.server.board.dto.*;
 import com.blink.server.board.dto.BoardDetailResponseDto;
 import com.blink.server.board.entity.Board;
 import com.blink.server.board.repository.BoardRepository;
+import com.blink.server.boardComment.service.BoardCommentService;
 import com.blink.server.member.entity.Member;
 import com.blink.server.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import java.util.List;
 public class BoardService {
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
+    private final BoardCommentService commentService;
 
     /**
      * 글 작성하는 메서드
@@ -65,9 +67,15 @@ public class BoardService {
 
                     dto.setBoardView(board.getBoardView() + 1);
 
+                            // 댓글 목록 가져오기
+                    return commentService.getBoardCommentListByBoardCode(boardCode)
+                            .flatMap(commentList -> {
+                            dto.setCommentList(commentList);
+
                     // board view 증가 후 dto 반환
                     return boardRepository.increaseView(objectId)
                             .then(Mono.just(dto));  // view 증가 후 DTO 반환
+                            });
                 })
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("작성글이 존재하지 않습니다.")));
     }
