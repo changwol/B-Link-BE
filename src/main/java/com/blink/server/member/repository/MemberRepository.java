@@ -24,8 +24,5 @@ public interface MemberRepository extends ReactiveCrudRepository<Member, String>
 
     Flux<Member> findByMemberName(String memberId);
 
-    Flux<Member> findByMemberNameContainingIgnoreCase(String memberName);
-
-
-//    List<String> getRoomIds(String memberId);
+    Flux<Member> findTop10ByMemberNameContainingIgnoreCase(String memberName);
 }

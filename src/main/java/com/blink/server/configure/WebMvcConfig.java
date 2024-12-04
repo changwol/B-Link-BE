@@ -19,4 +19,4 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .allowedHeaders("*"); // 모든 헤더 허용
         logger.info("CORS 설정 적용: {} 및 {}", frontServerUrl, Url2);
     }
-}//첫 대화 가져오기
+}

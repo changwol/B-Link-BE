@@ -45,39 +45,6 @@ public class ChatRoomService {
         this.chatRoomRepository = chatRoomRepository;
         this.mongoTemplate = mongoTemplate;
     }
-
-//    public Flux<Message> findChatRoomByRoomId(String> roomId) {
-//        return messageRepository.findByRoomId(roomId) // roomId로 ChatRoom 조회
-//                .switchIfEmpty(Mono.error(new RuntimeException("ChatRoom not found"))); // 방이 없을 경우 에러 처리
-//    }
-
-//    public Mono<Void> updateRoomId(String memberId1, String memberId2, String newRoomId) {
-//        return memberService.getRoomIds(memberId1)
-//                .flatMap(member1RoomIds -> {
-//                    if (!member1RoomIds.contains(newRoomId)) {
-//                        Criteria criteria = Criteria.where("memberId").is(memberId1);
-//                        Query query = new Query(criteria);
-//                        Update update = new Update().addToSet("roomIds", newRoomId);
-//                        mongoTemplate.updateFirst(query, update, Member.class);
-//                        brokerMessagingTemplate.convertAndSendToUser(memberId1, "/topic/room/find", newRoomId);
-//                        System.out.println("Member1의 룸 추가");
-//                    }
-//                    return Mono.empty();
-//                })
-//                .then(memberService.getRoomIds(memberId2))
-//                .flatMap(member2RoomIds -> {
-//                    if (!member2RoomIds.contains(newRoomId)) {
-//                        Criteria criteria = Criteria.where("memberId").is(memberId2);
-//                        Query query = new Query(criteria);
-//                        Update update = new Update().addToSet("roomIds", newRoomId);
-//                        mongoTemplate.updateFirst(query, update, Member.class);
-//                        brokerMessagingTemplate.convertAndSendToUser(memberId2, "/topic/room/find", newRoomId);
-//                        System.out.println("Member2의 룸 추가");
-//                    }
-//                    return Mono.empty();
-//                });
-//    }
-
     public Mono<Object> updateRoomId(String memberId1, String memberId2, String newRoomId) {
         return memberService.getRoomIds(memberId1)
                 .flatMap(member1RoomIds -> {
@@ -138,66 +105,6 @@ public class ChatRoomService {
                             .collectList(); // 결과를 리스트로 수집
                 });
     }
-
-    //    public String getRoomId(String roomName) {
-//        // 방 이름을 기준으로 쿼리 생성
-//        Query query = new Query();
-//        query.addCriteria(Criteria.where("roomName").is(roomName));
-//
-//        // 방 정보를 조회
-//        ChatRoom room = mongoTemplate.findOne(query, ChatRoom.class); // Room은 방 정보를 가진 도메인 클래스
-//
-//        // 방이 존재하지 않으면 null 반환
-//        if (room == null) {
-//            return null;
-//        }
-//
-//        return room.getId(); // 방 ID 반환
-//    }
-    public Mono<String> getRoomId(String roomName) {
-        // 방 이름을 기준으로 쿼리 생성
-        Query query = new Query();
-        query.addCriteria(Criteria.where("roomName").is(roomName));
-
-        return Mono.fromCallable(() -> mongoTemplate.findOne(query, ChatRoom.class)) // 비동기적으로 조회
-                .map(room -> {
-                    if (room == null) {
-                        return null; // 방이 없으면 null 반환
-                    }
-                    return room.getId(); // 방 ID 반환
-                });
-    }
-
-    public Flux<Object> getMemberNameByMemberId(String memberId) {
-        return memberService.getMemberName(memberId);
-    }
-
-    //    public Flux<Member> getFilteredRooms(String memberId, String searchTerm) {
-//        return memberRepository.findByMemberName(memberId)
-//                .flatMap(member -> {
-//                    // member의 이름과 비교하여 방 정보를 필터링
-//                    return memberRepository.findByMemberName(memberId)
-//                            .filter(roomInfo -> roomInfo.getMemberName().toLowerCase().contains(searchTerm.toLowerCase()));
-//                });
-//    }
-    public Flux<Member> getFilteredMemberInfo(String memberName, String searchTerm) {
-        System.out.println("searchTerm : " + searchTerm);
-        System.out.println("memberName : " + memberName);
-        return memberRepository.findByMemberName(memberName)
-                .doOnNext(member -> System.out.println("Found member: {}"+ member)) // memberId로 사용자를 찾습니다.
-
-                .flatMap(member -> {
-                    // 사용자의 이름이 검색어에 포함되는지 확인
-                    if (member.getMemberName().toLowerCase().contains(searchTerm.toLowerCase())) {
-                        return Flux.just(member); // 검색어에 맞는 사용자 반환
-                    } else {
-                        return Flux.empty(); // 검색어에 맞지 않으면 빈 Flux 반환
-                    }
-                })
-                .switchIfEmpty(Flux.error(new RuntimeException("Member not found or does not match search term"))); // 사용자가 없거나 일치하지 않는 경우
-    }
-
-
     public Mono<ChatRoom> createRoom(ChatRoomDto room) {
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.setRoomName(room.getRoomName());
@@ -208,8 +115,4 @@ public class ChatRoomService {
         chatRoom.getLastchatTime();
         return chatRoomRepository.save(chatRoom);
     }
-
-//    public Flux<Member> getMemberName(String searchTerm) {
-//        return memberRepository.findByMemberNameContainingIgnoreCase(searchTerm);
-//    }
 }
