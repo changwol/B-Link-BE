@@ -42,7 +42,7 @@ public class ChatRoomController {
     public ChatRoomController(ChatRoomService chatRoomService, MemberService memberService, SimpMessagingTemplate messagingTemplate) {
         this.chatRoomService = chatRoomService;
         this.memberService = memberService;
-        this.messagingTemplate = messagingTemplate; // 메시징 템플릿 주입
+        this.messagingTemplate = messagingTemplate;
     }
 
     @MessageMapping("/find/{memberId}")
@@ -112,10 +112,10 @@ public class ChatRoomController {
         // ChatRoom 객체를 생성하고, 방을 저장합니다.
         return chatRoomService.save(chatRoom)
                 .flatMap(savedRoom -> {
-                    // 방 ID를 저장합니다.
+                    // 방 ID를 저장
                     String roomId = savedRoom.getId();
 
-                    // 두 멤버에게 방 ID를 추가합니다.
+                    // 두 멤버에게 방 ID를 추가
                     return memberService.addRoomIdToMember(member1, Mono.just(roomId))
                             .then(memberService.addRoomIdToMember(member2, Mono.just(roomId)))
                             .then(Mono.just(savedRoom)); // 저장된 방 반환
